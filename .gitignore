@@ -1,0 +1,40 @@
+# Compiled C++ executables and object files
+*.exe
+*.o
+*.obj
+*.out
+*.a
+*.lib
+*.dll
+*.so
+*.pdb
+
+# Build directories
+build/
+bin/
+obj/
+debug/
+release/
+
+# Visual Studio Code local settings
+.vscode/
+
+# Temporary and log files
+*.tmp
+*.temp
+*.log
+*.bak
+*~
+
+# Generated inventory and application data
+data/*
+!data/.gitkeep
+
+# Generated reports
+reports/
+
+# Local environment and secrets
+.env
+.env.*
+*.key
+*.pem
