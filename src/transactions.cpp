@@ -104,7 +104,7 @@ bool addTransaction(std::vector<Transaction>& transactions,
     }
     if (!std::isfinite(transaction.transactionAmount) ||
         (transaction.transactionType == "STOCK_IN" && transaction.transactionAmount != 0.0) ||
-        (transaction.transactionType == "STOCK_OUT" && transaction.transactionAmount <= 0.0)) {
+        (transaction.transactionType == "STOCK_OUT" && transaction.transactionAmount < 0.0)) {
         error = "Transaction amount is invalid for the stock movement.";
         return false;
     }
