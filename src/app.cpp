@@ -169,14 +169,14 @@ bool login(const std::vector<User>& users)
             return false;
         }
 
-        const bool accepted = authenticateUser(
+        const bool isAuthenticated = authenticateUser(
             users, *username, password
         );
 
         std::fill(password.begin(), password.end(), '\0');
         password.clear();
 
-        if (accepted) {
+        if (isAuthenticated) {
             message("Login successful.");
             return true;
         }
@@ -206,34 +206,34 @@ bool supplierExists(const AppState& state, int id)
 
 bool saveProductChanges(
     AppState& state,
-    std::vector<Product>& updated
+    std::vector<Product>& updatedProducts
 )
 {
     std::string error;
 
-    if (!saveProducts(updated, PRODUCTS_FILE, error)) {
+    if (!saveProducts(updatedProducts, PRODUCTS_FILE, error)) {
         errorMessage(error);
         return false;
     }
 
-    state.products = std::move(updated);
+    state.products = std::move(updatedProducts);
     message("Inventory changes saved successfully.");
     return true;
 }
 
 bool saveSupplierChanges(
     AppState& state,
-    std::vector<Supplier>& updated
+    std::vector<Supplier>& updatedSuppliers
 )
 {
     std::string error;
 
-    if (!saveSuppliers(updated, SUPPLIERS_FILE, error)) {
+    if (!saveSuppliers(updatedSuppliers, SUPPLIERS_FILE, error)) {
         errorMessage(error);
         return false;
     }
 
-    state.suppliers = std::move(updated);
+    state.suppliers = std::move(updatedSuppliers);
     message("Supplier changes saved successfully.");
     return true;
 }
@@ -314,7 +314,7 @@ void viewProductsScreen(const AppState& state)
 // F03 - Search Product
 void searchProductScreen(const AppState& state)
 {
-    beginScreen("Search Product");
+    beginScreen("Search Product", 120);
 
     displayMenuOptions({
         "Search by Product ID",
@@ -356,7 +356,7 @@ void searchProductScreen(const AppState& state)
 // F04 - Update Product Details
 void updateProductScreen(AppState& state)
 {
-    beginScreen("Update Product");
+    beginScreen("Update Product", 120);
 
     const auto id = inputId("Product ID: ");
     if (!id) return;
@@ -469,7 +469,7 @@ void updateProductScreen(AppState& state)
 // F05 - Delete Product
 void deleteProductScreen(AppState& state)
 {
-    beginScreen("Delete Product");
+    beginScreen("Delete Product", 120);
 
     const auto id = inputId("Product ID: ");
     if (!id) return;
@@ -508,7 +508,7 @@ void deleteProductScreen(AppState& state)
 // F06 and F07 - Stock In / Stock Out
 void stockMovementScreen(AppState& state, bool incoming)
 {
-    beginScreen(incoming ? "Stock In" : "Stock Out");
+    beginScreen(incoming ? "Stock In" : "Stock Out", 120);
 
     const auto id = inputId("Product ID: ");
     if (!id) return;
