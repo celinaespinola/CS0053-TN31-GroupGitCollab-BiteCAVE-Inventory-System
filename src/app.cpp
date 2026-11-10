@@ -660,38 +660,7 @@ void lowStockScreen(const AppState& state)
 void summaryScreen(const AppState& state)
 {
     beginScreen("Inventory Summary");
-
-    const auto summary = generateInventorySummary(
-        state.products
-    );
-
-    message(
-        "Total products: " +
-        std::to_string(summary.totalProducts)
-    );
-
-    message(
-        "Total units: " +
-        std::to_string(summary.totalUnits)
-    );
-
-    std::ostringstream value;
-
-    value << std::fixed
-          << std::setprecision(2)
-          << summary.inventoryValue;
-
-    message("Inventory value: PHP " + value.str());
-
-    message(
-        "Low-stock products: " +
-        std::to_string(summary.lowStockCount)
-    );
-
-    message(
-        "Out-of-stock products: " +
-        std::to_string(summary.outOfStockCount)
-    );
+    displayInventorySummary(generateInventorySummary(state.products));
 }
 
 // F10 - Sort Products

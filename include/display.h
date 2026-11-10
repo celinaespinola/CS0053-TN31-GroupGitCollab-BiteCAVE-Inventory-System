@@ -5,6 +5,7 @@
 #include "product.h"
 #include "supplier.h"
 #include "transaction.h"
+#include "reports.h"
 
 inline constexpr int defaultDisplayWidth = 96;
 
@@ -40,6 +41,11 @@ void displaySuppliers(
 
 void displayTransactions(
     const std::vector<Transaction>& transactions
+);
+
+// Renders summary values inside the active screen frame.
+void displayInventorySummary(
+    const InventorySummary& summary
 );
 
 void displayMessage(

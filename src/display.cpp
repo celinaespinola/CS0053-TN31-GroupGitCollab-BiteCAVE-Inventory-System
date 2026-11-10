@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <utility>
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -133,6 +134,11 @@ void border(int width, char character = '-', bool header = false)
               << corner << '\n';
 }
 
+void horizontalBar(int width)
+{
+    std::cout << std::string(static_cast<std::size_t>(width), '=') << '\n';
+}
+
 void textRow(const std::string& text, int width, bool centered = false)
 {
     const int inside = width - 4;
@@ -142,6 +148,14 @@ void textRow(const std::string& text, int width, bool centered = false)
         std::cout << "| " << std::string(left, ' ') << line
                   << std::string(remaining - left, ' ') << " |\n";
     }
+}
+
+void textBox(const std::string& text, int width)
+{
+    std::cout << '\n';
+    horizontalBar(width);
+    textRow(text, width);
+    horizontalBar(width);
 }
 
 // Presentation only: preserve the beginning and final four characters.
@@ -248,6 +262,8 @@ void displayMenuOptions(const std::vector<std::string>& options, int columns)
     const int gap = columns == 2 ? 4 : 0;
     const int cellWidth = (inside - gap) / columns;
     const std::size_t rows = (options.size() + columns - 1) / columns;
+    std::cout << '\n';
+    horizontalBar(width);
     textRow("", width);
     for (std::size_t row = 0; row < rows; ++row) {
         std::vector<std::vector<std::string>> cells;
@@ -276,7 +292,7 @@ void displayMenuOptions(const std::vector<std::string>& options, int columns)
         }
     }
     textRow("", width);
-    border(width, '=');
+    horizontalBar(width);
 }
 
 void displayMainMenu()
@@ -295,9 +311,11 @@ void displayMainMenu()
 void displayProducts(const std::vector<Product>& products)
 {
     const int width = screenWidth();
+    std::cout << '\n';
+    horizontalBar(width);
     if (products.empty()) {
         textRow("No products to display.", width, true);
-        border(width, '=');
+        horizontalBar(width);
         return;
     }
 
@@ -318,13 +336,13 @@ void displayProducts(const std::vector<Product>& products)
     if (width < required) {
         textRow("A one-row product table needs at least " + std::to_string(required) +
                 " columns. Use a wider product screen to see all fields without shortening numbers.", width);
-        border(width, '=');
+        horizontalBar(width);
         return;
     }
     columns[2] = std::min(12, width - fixed - minimumName - separators);
     columns[1] = width - fixed - columns[2] - separators;
     tableRow({"ID", "Product name", "Category", "Unit price", "Qty", "Min stock", "Supplier ID", "Status"}, columns);
-    border(width, '=');
+    horizontalBar(width);
     for (const auto& product : products) {
         std::string category = printableText(product.category);
         if (category.size() > static_cast<std::size_t>(columns[2])) {
@@ -340,51 +358,75 @@ void displayProducts(const std::vector<Product>& products)
                   stockStatus(product)}, columns,
                  {true, false, false, true, true, true, true, false});
     }
-    border(width, '=');
+    horizontalBar(width);
 }
 
 void displaySuppliers(const std::vector<Supplier>& suppliers)
 {
     const int width = screenWidth();
+    std::cout << '\n';
+    horizontalBar(width);
     if (suppliers.empty()) {
         textRow("No suppliers to display.", width, true);
-        border(width, '=');
+        horizontalBar(width);
         return;
     }
+
     const int nameWidth = (width - 38) / 2;
     const std::vector<int> columns = {10, nameWidth, 15, width - 38 - nameWidth};
     if (width >= 100) {
         tableRow({"ID", "Supplier name", "Contact number", "Address"}, columns);
-        border(width, '=');
+        horizontalBar(width);
     }
+
+    std::size_t labelWidth = std::string("Contact").size();
     for (const auto& supplier : suppliers) {
+        labelWidth = std::max(
+            labelWidth, ("Supplier " + std::to_string(supplier.supplierId)).size()
+        );
+    }
+    const auto detailRow = [width, labelWidth](
+        const std::string& label, const std::string& value
+    ) {
+        textRow(label + std::string(labelWidth - label.size(), ' ') +
+                " : " + value, width);
+    };
+
+    bool firstSupplier = true;
+    for (const auto& supplier : suppliers) {
+        if (!firstSupplier) {
+            border(width);
+        }
+        firstSupplier = false;
+
         if (width >= 100) {
             tableRow({std::to_string(supplier.supplierId), supplier.supplierName,
                       supplier.contactNumber, supplier.address}, columns,
                      {true, false, false, false});
         } else {
-            textRow("Supplier " + std::to_string(supplier.supplierId) + ": " + supplier.supplierName, width);
-            textRow("Contact: " + supplier.contactNumber, width);
-            textRow("Address: " + supplier.address, width);
+            detailRow("Supplier " + std::to_string(supplier.supplierId), supplier.supplierName);
+            detailRow("Contact", supplier.contactNumber);
+            detailRow("Address", supplier.address);
         }
-        border(width);
     }
-    border(width, '=');
+    horizontalBar(width);
 }
 
 void displayTransactions(const std::vector<Transaction>& transactions)
 {
     const int width = screenWidth();
+    std::cout << '\n';
+    horizontalBar(width);
     if (transactions.empty()) {
         textRow("No transactions to display.", width, true);
-        border(width, '=');
+        horizontalBar(width);
         return;
     }
     const std::vector<int> columns = {8, 19, 9, 10, 10, 10, 10, width - 101};
     if (width >= 116) {
         tableRow({"Txn ID", "Date and time", "Type", "Product ID", "Qty change",
                   "Previous", "Updated", "Amount"}, columns);
-        border(width, '=');
+        horizontalBar(width);
     }
     for (const auto& transaction : transactions) {
         if (width >= 116) {
@@ -407,17 +449,48 @@ void displayTransactions(const std::vector<Transaction>& transactions)
         }
         border(width);
     }
-    border(width, '=');
+    horizontalBar(width);
+}
+
+void displayInventorySummary(const InventorySummary& summary)
+{
+    const int width = screenWidth();
+    const std::vector<std::pair<std::string, std::string>> fields = {
+        {"Total products", std::to_string(summary.totalProducts)},
+        {"Total inventory units", std::to_string(summary.totalUnits)},
+        {"Inventory value", money(summary.inventoryValue)},
+        {"Low-stock products", std::to_string(summary.lowStockCount)},
+        {"Out-of-stock products", std::to_string(summary.outOfStockCount)}
+    };
+
+    std::size_t labelWidth = 0;
+    for (const auto& field : fields) {
+        labelWidth = std::max(labelWidth, field.first.size());
+    }
+    textRow("", width);
+    for (const auto& field : fields) {
+        if (width - 4 <= static_cast<int>(labelWidth) + 3) {
+            textRow(field.first + ": " + field.second, width);
+            continue;
+        }
+
+        std::ostringstream row;
+        row << std::left << std::setw(static_cast<int>(labelWidth))
+            << field.first << " : " << field.second;
+        textRow(row.str(), width);
+    }
+    textRow("", width);
+    textRow("Value uses recorded unit prices; it is not profit.", width);
+    textRow("", width);
+    std::cout << std::string(static_cast<std::size_t>(width), '=') << '\n';
 }
 
 void displayMessage(const std::string& message)
 {
-    const int width = screenWidth();
-    textRow(message, width);
+    textBox(message, screenWidth());
 }
 
 void displayError(const std::string& message)
 {
-    const int width = screenWidth();
-    textRow("[ERROR] " + message, width);
+    textBox("[ERROR] " + message, screenWidth());
 }
