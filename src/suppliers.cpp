@@ -3,13 +3,13 @@
 #include <algorithm>
 #include <cctype>
 
-namespace {
+namespace
+{
 
 bool hasInformation(const std::string& value)
 {
-    return std::any_of(value.begin(), value.end(), [](unsigned char character) {
-        return !std::isspace(character);
-    });
+    return std::any_of(value.begin(), value.end(),
+                       [](unsigned char character) { return !std::isspace(character); });
 }
 
 char lowerCharacter(unsigned char character)
@@ -20,34 +20,33 @@ char lowerCharacter(unsigned char character)
 bool containsIgnoreCase(const std::string& text, const std::string& query)
 {
     return std::search(text.begin(), text.end(), query.begin(), query.end(),
-                       [](unsigned char left, unsigned char right) {
-                           return lowerCharacter(left) == lowerCharacter(right);
-                       }) != text.end();
+                       [](unsigned char left, unsigned char right)
+                       { return lowerCharacter(left) == lowerCharacter(right); }) != text.end();
 }
 
 bool hasRequiredInformation(const Supplier& supplier)
 {
-    return hasInformation(supplier.supplierName) &&
-           hasInformation(supplier.contactNumber) &&
+    return hasInformation(supplier.supplierName) && hasInformation(supplier.contactNumber) &&
            hasInformation(supplier.address);
 }
 
 } // namespace
 
-bool addSupplier(std::vector<Supplier>& suppliers, const Supplier& supplier,
-                 std::string& error)
+bool addSupplier(std::vector<Supplier>& suppliers, const Supplier& supplier, std::string& error)
 {
-    if (supplier.supplierId <= 0) {
+    if (supplier.supplierId <= 0)
+    {
         error = "Supplier ID must be positive.";
         return false;
     }
-    if (std::any_of(suppliers.begin(), suppliers.end(), [&](const Supplier& existing) {
-            return existing.supplierId == supplier.supplierId;
-        })) {
+    if (std::any_of(suppliers.begin(), suppliers.end(), [&](const Supplier& existing)
+                    { return existing.supplierId == supplier.supplierId; }))
+    {
         error = "Supplier ID already exists.";
         return false;
     }
-    if (!hasRequiredInformation(supplier)) {
+    if (!hasRequiredInformation(supplier))
+    {
         error = "Supplier name, contact number, and address are required.";
         return false;
     }
@@ -61,8 +60,10 @@ std::vector<Supplier> searchSuppliersByName(const std::vector<Supplier>& supplie
                                             const std::string& name)
 {
     std::vector<Supplier> matches;
-    for (const Supplier& supplier : suppliers) {
-        if (containsIgnoreCase(supplier.supplierName, name)) {
+    for (const Supplier& supplier : suppliers)
+    {
+        if (containsIgnoreCase(supplier.supplierName, name))
+        {
             matches.push_back(supplier);
         }
     }
@@ -72,19 +73,21 @@ std::vector<Supplier> searchSuppliersByName(const std::vector<Supplier>& supplie
 bool updateSupplier(std::vector<Supplier>& suppliers, int supplierId,
                     const Supplier& updatedSupplier, std::string& error)
 {
-    auto existing = std::find_if(suppliers.begin(), suppliers.end(),
-                                 [supplierId](const Supplier& supplier) {
-                                     return supplier.supplierId == supplierId;
-                                 });
-    if (existing == suppliers.end()) {
+    auto existing =
+        std::find_if(suppliers.begin(), suppliers.end(), [supplierId](const Supplier& supplier)
+                     { return supplier.supplierId == supplierId; });
+    if (existing == suppliers.end())
+    {
         error = "Supplier not found.";
         return false;
     }
-    if (updatedSupplier.supplierId != supplierId) {
+    if (updatedSupplier.supplierId != supplierId)
+    {
         error = "Supplier ID cannot be changed.";
         return false;
     }
-    if (!hasRequiredInformation(updatedSupplier)) {
+    if (!hasRequiredInformation(updatedSupplier))
+    {
         error = "Supplier name, contact number, and address are required.";
         return false;
     }
@@ -94,21 +97,20 @@ bool updateSupplier(std::vector<Supplier>& suppliers, int supplierId,
     return true;
 }
 
-bool deleteSupplier(std::vector<Supplier>& suppliers,
-                    const std::vector<Product>& products, int supplierId,
-                    std::string& error)
+bool deleteSupplier(std::vector<Supplier>& suppliers, const std::vector<Product>& products,
+                    int supplierId, std::string& error)
 {
-    auto existing = std::find_if(suppliers.begin(), suppliers.end(),
-                                 [supplierId](const Supplier& supplier) {
-                                     return supplier.supplierId == supplierId;
-                                 });
-    if (existing == suppliers.end()) {
+    auto existing =
+        std::find_if(suppliers.begin(), suppliers.end(), [supplierId](const Supplier& supplier)
+                     { return supplier.supplierId == supplierId; });
+    if (existing == suppliers.end())
+    {
         error = "Supplier not found.";
         return false;
     }
-    if (std::any_of(products.begin(), products.end(), [supplierId](const Product& product) {
-            return product.supplierId == supplierId;
-        })) {
+    if (std::any_of(products.begin(), products.end(), [supplierId](const Product& product)
+                    { return product.supplierId == supplierId; }))
+    {
         error = "Supplier is referenced by an active product.";
         return false;
     }
