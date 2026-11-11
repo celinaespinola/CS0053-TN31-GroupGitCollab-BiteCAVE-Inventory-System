@@ -36,14 +36,17 @@ The main menu contains options 1–14 for inventory functions, option 15 for log
 
 ## 3. Technologies Used
 
-| Technology | Purpose |
+| Technology / Tool | Purpose |
 |---|---|
 | C++17 | Primary programming language |
-| G++ | Compilation and linking |
+| MSYS2 UCRT64 G++ 16.2.0 | Compilation and linking of the C++17 application |
 | OpenSSL | PBKDF2-HMAC-SHA256 password hashing |
 | C++ Standard Library | Collections, file operations, input/output, and data processing |
 | CSV | Persistent inventory, supplier, and transaction storage |
 | Visual Studio Code | Development environment |
+| clang-format 19.1.7 | Standardizing C++ code formatting |
+| clang-tidy | Static analysis and identification of potential code-quality issues |
+| GDB 17.2 | Debugging using breakpoints and variable inspection |
 | Git | Version control |
 | GitHub | Repository hosting, collaboration, pull requests, and code review |
 
@@ -78,11 +81,14 @@ CS0053-TN31-GroupGitCollab-BiteCAVE-Inventory-System/
 │   └── validation.cpp
 ├── data/
 ├── reports/
+├── .clang-format
 ├── .gitignore
 └── README.md
 ```
 
 The `data/` directory stores application records, while the `reports/` directory contains exported CSV reports. These directories may initially be empty.
+
+The `.clang-format` file contains the shared C++ formatting configuration used to maintain consistent code style across the project.
 
 ## 5. Prerequisites
 
